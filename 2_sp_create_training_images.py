@@ -20,12 +20,14 @@ import shutil
 space = 5
 
 # Path to the CSV file with filenames and intervals
-csv_file_path = 'csv/solar_panels_6x6_jan_21_2025.csv'
-parent_directory = 'l0b'
+csv_file_path = 'csv/solar_panels_6x6_feb_22_2025.csv'
+# parent_directory = 'l0b'
+parent_directory = r'Z:\moc\l0b'
+
 
 # Define output folders
-sp_folder = 'images/sp'
-no_sp_folder = 'images/no_sp'
+sp_folder = 'training_images/sp'
+no_sp_folder = 'training_images/no_sp'
 
 # Ensure output folders exist
 os.makedirs(no_sp_folder, exist_ok=True)
@@ -83,15 +85,17 @@ def extract_intervals_per_orbit(data):
                             orbit_intervals[orbit][box].append((start, end))
     return orbit_intervals
 
-# Function to search for .nc file
+# Function to search for .nc file in all subdirectories
 def find_nc_file(parent_directory, orbit_number):
     orbit_str = str(int(orbit_number)).zfill(5)
-    pattern = re.compile(r'awe_l0b_(.*)_' + orbit_str + r'_(.*)\.nc')
+    pattern = re.compile(r'awe_l0b_q20_(.*)_' + orbit_str + r'_(.*)\.nc')
+    
     for root, dirs, files in os.walk(parent_directory):
         for file in files:
             if pattern.match(file):
                 return os.path.join(root, file)
-    raise FileNotFoundError(f"No file found for orbit number {orbit_str}")
+    raise FileNotFoundError(f"No file found for orbit number {orbit_str} in {parent_directory}")
+
 
 # Function to save three-layer images
 def save_image(data, folder, orbit_number, frame_index, box_idx, boxes):
@@ -124,11 +128,33 @@ def save_image(data, folder, orbit_number, frame_index, box_idx, boxes):
 
 # Main function to process intervals and save images
 def process_intervals_and_save_images(data, grid_boxes):
-    threshold = 6 # Number of images away from the boundary between sp and no sp
-    sp_chance = .5
-    no_sp_chance = .12 # Only save 1/10 of no sp images
+    sp_threshold = 4  # Frames inside the intervals, 4 frames away from the boundary is considered sp
+    no_sp_threshold = 8  # Frames outside the intervals, 8 frames away from the boundary is considered no_sp  # Number of images away from the boundary between sp and no sp
+    sp_chance = 0.5
+    no_sp_chance = 0.10  # Only save 1/10 of no sp images
     orbit_intervals = extract_intervals_per_orbit(data)
+
+    # Add extra intervals manually
+    extra_intervals = {
+        113: {"(3,4)": [(1258, 1817)]},
+        2450: {"(5,3)": [(1873, 1911)]},
+        2480: {"(5,3)": [(1840, 1863)]}
+    }
+    
+    for orbit, boxes in extra_intervals.items():
+        if orbit in orbit_intervals:
+            for box, intervals in boxes.items():
+                if box in orbit_intervals[orbit]:
+                    orbit_intervals[orbit][box].extend(intervals)
+                else:
+                    orbit_intervals[orbit][box] = intervals
+        else:
+            orbit_intervals[orbit] = boxes
+    
     for orbit_number, boxes in orbit_intervals.items():
+        print(f"Processing orbit: {orbit_number}")
+        print(f"Intervals: {boxes}")
+        
         try:
             nc_file_path = find_nc_file(parent_directory, orbit_number)
         except FileNotFoundError as e:
@@ -138,14 +164,16 @@ def process_intervals_and_save_images(data, grid_boxes):
         with Dataset(nc_file_path, 'r') as nc:
             radiance = nc.variables['Radiance'][:]
             num_frames = radiance.shape[0]
+            
             for box, intervals in boxes.items():
                 for i in range(space, num_frames - space):
                     for interval in intervals:
-                        if interval[0] + threshold <= i <= interval[1] - threshold:
+                        if interval[0] + sp_threshold <= i <= interval[1] - sp_threshold:
                             if random.random() < sp_chance:
                                 save_image(radiance, sp_folder, orbit_number, i, box, grid_boxes)
-                        elif all(i < interval[0] - threshold or i > interval[1] + threshold for interval in intervals):
+                        elif all(i < interval[0] - no_sp_threshold or i > interval[1] + no_sp_threshold for interval in intervals):
                             if random.random() < no_sp_chance:
+                                # print(f"Saving No-SP image: Orbit {orbit_number}, Box {box}, Frame {i}")
                                 save_image(radiance, no_sp_folder, orbit_number, i, box, grid_boxes)
 
 # Load data

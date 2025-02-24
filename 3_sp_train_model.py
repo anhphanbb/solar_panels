@@ -42,7 +42,7 @@ new_image_size = (43, 43)
 
 # Load Data and Resize
 data = tf.keras.utils.image_dataset_from_directory(
-    'images',
+    'training_images',
     image_size=new_image_size,
     color_mode='rgb',  # Load images as RGB
     batch_size=32,
@@ -100,7 +100,7 @@ logdir = f'logs/resnet_model'
 tensorboard_callback = TensorBoard(log_dir=logdir)
 early_stopping_callback = EarlyStopping(
     monitor='val_loss',
-    patience=100,
+    patience=50,
     restore_best_weights=True
 )
 
@@ -108,7 +108,7 @@ start_time = time.time()
 
 hist = model.fit(
     train,
-    epochs=400,
+    epochs=300,
     validation_data=val,
     callbacks=[tensorboard_callback, early_stopping_callback]
 )
@@ -120,7 +120,7 @@ histories.append(hist)
 
 # Save the Model
 os.makedirs('models', exist_ok=True)
-model.save('models/DeepLearning_resnet_model_sp_acc_and_recall.h5')
+model.save('models/DeepLearning_resnet_model_sp_acc_and_recall_feb_24_2025.h5')
 
 # Plot validation accuracy
 plt.figure(figsize=(12, 8))

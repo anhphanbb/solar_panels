@@ -163,3 +163,4 @@ cython_debug/
 /models
 /l0b
 /nc_files_to_predict
+/training_images
