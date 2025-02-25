@@ -50,6 +50,16 @@ def compute_running_average(predictions, window_size):
     """
     return np.convolve(predictions, np.ones(window_size) / window_size, mode='valid')
 
+# Function to remove all images from an orbit folder after processing
+def remove_orbit_images(orbit_folder):
+    for filename in os.listdir(orbit_folder):
+        file_path = os.path.join(orbit_folder, filename)
+        try:
+            if os.path.isfile(file_path) or os.path.islink(file_path):
+                os.unlink(file_path)
+        except Exception as e:
+            print(f'Failed to delete {file_path}. Reason: {e}')
+
 # Function to process a single orbit folder with batching
 def process_orbit_folder(orbit_folder, orbit_number, batch_size=32, avg_window_size=9):
     start_time = time.time()
@@ -89,6 +99,9 @@ def process_orbit_folder(orbit_folder, orbit_number, batch_size=32, avg_window_s
 
         # Show progress
         print(f"Processed {start_idx + len(batch_data)}/{total_images} images in Orbit {orbit_number}...")
+    
+    # Remove images after processing
+    remove_orbit_images(orbit_folder)
 
     # Compute running averages for each box
     df_results = pd.DataFrame(results)
