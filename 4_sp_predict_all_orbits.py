@@ -13,15 +13,16 @@ import re
 import time
 from tensorflow.keras.models import load_model
 from tensorflow.keras.applications.resnet50 import preprocess_input
+import shutil
 
 # Path to the folder containing orbit subfolders with images
-input_folder = 'images_to_predict'
+input_folder = 'sp_images_to_predict'
 
 # Output folder for CSV results
-csv_output_folder = 'orbit_predictions'
+csv_output_folder = 'sp_orbit_predictions'
 
 # Path to the pre-trained model
-model_path = 'models/DeepLearning_resnet_model_sp_acc_and_recall.h5'
+model_path = 'models/DeepLearning_resnet_model_sp_acc_and_recall_feb_24_2025.h5'
 
 # Ensure the output folder for CSV files exists
 os.makedirs(csv_output_folder, exist_ok=True)
@@ -50,15 +51,13 @@ def compute_running_average(predictions, window_size):
     """
     return np.convolve(predictions, np.ones(window_size) / window_size, mode='valid')
 
-# Function to remove all images from an orbit folder after processing
 def remove_orbit_images(orbit_folder):
-    for filename in os.listdir(orbit_folder):
-        file_path = os.path.join(orbit_folder, filename)
-        try:
-            if os.path.isfile(file_path) or os.path.islink(file_path):
-                os.unlink(file_path)
-        except Exception as e:
-            print(f'Failed to delete {file_path}. Reason: {e}')
+    try:
+        # Remove all files and the folder itself
+        shutil.rmtree(orbit_folder)
+        print(f'Successfully deleted {orbit_folder}')
+    except Exception as e:
+        print(f'Failed to delete {orbit_folder}. Reason: {e}')
 
 # Function to process a single orbit folder with batching
 def process_orbit_folder(orbit_folder, orbit_number, batch_size=32, avg_window_size=9):

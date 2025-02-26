@@ -164,3 +164,5 @@ cython_debug/
 /l0b
 /nc_files_to_predict
 /training_images
+/sp_orbit_predictions
+/sp_images_to_predict
