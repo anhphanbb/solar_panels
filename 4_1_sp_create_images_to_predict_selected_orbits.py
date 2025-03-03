@@ -24,8 +24,8 @@ output_folder = 'sp_images_to_predict'
 space = 5
 
 # List of specific orbits to process
-divisible_by_10 = list(range(10, 2001, 10))
-orbit_list = divisible_by_10
+september_orbits_1 = list(range(4402, 4650, 1)) #4402 to 4649
+orbit_list = september_orbits_1
 
 # Ensure output folder exists
 os.makedirs(output_folder, exist_ok=True)

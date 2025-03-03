@@ -13,8 +13,8 @@ import re
 from scipy.spatial import ConvexHull, Delaunay
 
 # Paths and parameters
-parent_directory = 'nc_files_with_mlsp'
-output_directory = 'nc_files_with_mlspb'
+parent_directory = r'E:\soc\l0c\2024\09\nc_files_with_mlsp'
+output_directory = r'E:\soc\l0c\2024\09\nc_files_with_mlspb'
 os.makedirs(output_directory, exist_ok=True)
 
 threshold = 0.3
@@ -132,7 +132,7 @@ for root, dirs, files in os.walk(parent_directory):
             mlspb = select_and_expand_clusters(thresholded, averaged_mlsp, expansion_factor)
 
             # Save to NetCDF
-            new_filename = re.sub(r'l0b', r'l0s', file)
+            new_filename = re.sub(r'l0c', r'l0s', file)
             new_filepath = os.path.join(output_directory, new_filename)
 
             with nc.Dataset(new_filepath, 'w', format='NETCDF4') as new_dataset:

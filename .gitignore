@@ -166,3 +166,4 @@ cython_debug/
 /training_images
 /sp_orbit_predictions
 /sp_images_to_predict
+/csv/AweSolarPanels

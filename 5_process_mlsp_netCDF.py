@@ -12,9 +12,10 @@ from netCDF4 import Dataset
 import re
 
 # Define input and output folders
-nc_input_folder = 'nc_files_to_predict'
-csv_predictions_folder = 'orbit_predictions'
-nc_output_folder = 'nc_files_with_mlsp'
+nc_input_folder = r'E:\soc\l0c\2024\09'
+csv_predictions_folder = 'sp_orbit_predictions/csv'
+# nc_output_folder = 'nc_files_with_mlsp'
+nc_output_folder = r'E:\soc\l0c\2024\09\nc_files_with_mlsp'
 
 # Ensure the output folder exists
 os.makedirs(nc_output_folder, exist_ok=True)
@@ -67,7 +68,7 @@ def add_mlsp_to_nc_file(input_file_path, output_file_path, mlsp_data):
 
 # Main script to process all files
 for file_name in os.listdir(nc_input_folder):
-    if file_name.endswith('.nc'):
+    if file_name.endswith('.nc') and 'q20' in file_name:
         print(file_name)
         orbit_number = extract_orbit_number(file_name)
         print(orbit_number)
@@ -75,7 +76,7 @@ for file_name in os.listdir(nc_input_folder):
             nc_file_path = os.path.join(nc_input_folder, file_name)
             csv_file_path = os.path.join(csv_predictions_folder, f"orbit_{orbit_number}_predictions.csv")
             if os.path.exists(csv_file_path):
-                output_file_path = os.path.join(nc_output_folder, file_name.replace('l1r', 'l1c'))
+                output_file_path = os.path.join(nc_output_folder, file_name)
                 
                 # Read CSV
                 predictions_df = pd.read_csv(csv_file_path)

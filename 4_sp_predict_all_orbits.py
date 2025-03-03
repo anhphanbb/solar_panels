@@ -19,7 +19,7 @@ import shutil
 input_folder = 'sp_images_to_predict'
 
 # Output folder for CSV results
-csv_output_folder = 'sp_orbit_predictions'
+csv_output_folder = 'sp_orbit_predictions/csv'
 
 # Path to the pre-trained model
 model_path = 'models/DeepLearning_resnet_model_sp_acc_and_recall_feb_24_2025.h5'
