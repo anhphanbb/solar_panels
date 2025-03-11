@@ -12,10 +12,13 @@ from netCDF4 import Dataset
 import re
 
 # Define input and output folders
-nc_input_folder = r'E:\soc\l0c\2024\09'
+# nc_input_folder = r'E:\soc\l0c\2024\09'
+nc_input_folder = 'sp_selected_orbits_no_glare'
+
 csv_predictions_folder = 'sp_orbit_predictions/csv'
-# nc_output_folder = 'nc_files_with_mlsp'
-nc_output_folder = r'E:\soc\l0c\2024\09\nc_files_with_mlsp'
+
+nc_output_folder = 'nc_files_with_mlsp'
+# nc_output_folder = r'E:\soc\l0c\2024\09\nc_files_with_mlsp'
 
 # Ensure the output folder exists
 os.makedirs(nc_output_folder, exist_ok=True)

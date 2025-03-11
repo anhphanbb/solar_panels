@@ -17,6 +17,7 @@ import time
 import os
 import numpy as np
 from sklearn.metrics import confusion_matrix
+from tensorflow.keras.metrics import Recall
 
 # Ensure TensorFlow is using GPU if available
 gpus = tf.config.experimental.list_physical_devices('GPU')
@@ -37,15 +38,15 @@ def augment(image):
     return image
 
 # Set new image size based on bounding box dimensions
-new_image_size = (43, 43)
+new_image_size = (256, 256)
 
 # Load Data and Resize
 data = tf.keras.utils.image_dataset_from_directory(
-    'images',
+    'glare_training_images',
     image_size=new_image_size,
-    color_mode='rgb',
+    color_mode='rgb',  # Load images as RGB
     batch_size=32,
-    label_mode='int'
+    label_mode='int'  # Ensure labels are integers for binary classification
 )
 
 # Apply augmentations
@@ -82,36 +83,42 @@ def create_resnet_model():
 
 model = create_resnet_model()
 
-# Compile model with recall as a metric
-model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy', tf.keras.metrics.Recall()])
+# Training and evaluating model
+results = []
+histories = []
+
+model.compile(
+    optimizer='adam', 
+    loss='binary_crossentropy', 
+    metrics= ['accuracy', Recall(name='recall')]
+)
 model.summary()
 
 logdir = f'logs/resnet_model'
 tensorboard_callback = TensorBoard(log_dir=logdir)
 early_stopping_callback = EarlyStopping(
     monitor='val_loss',
-    patience=100,
+    patience=50,
     restore_best_weights=True
 )
 
-# Train the model
 start_time = time.time()
 
 hist = model.fit(
     train,
-    epochs=400,
+    epochs=300,
     validation_data=val,
     callbacks=[tensorboard_callback, early_stopping_callback]
 )
 
 end_time = time.time()
 training_time = end_time - start_time
-print(f"Training completed in {training_time:.2f} seconds")
+
+histories.append(hist)
 
 # Save the Model
 os.makedirs('models', exist_ok=True)
-model.save('models/DeepLearning_resnet_model_sp.h5')
-
+model.save('models/resnet_model_glare_acc_and_recall_march_04_2025.h5')
 
 # Plot validation accuracy
 plt.figure(figsize=(12, 8))
@@ -122,7 +129,6 @@ plt.ylabel('Validation Accuracy')
 plt.legend()
 plt.grid()
 plt.show()
-
 
 # Evaluate model once on the test set
 y_true = []
@@ -160,9 +166,9 @@ for threshold in range(0, 101):  # Thresholds from 0 to 100
 
 # Save results to CSV
 confusion_matrix_df = pd.DataFrame(confusion_matrix_results)
-confusion_matrix_df.to_csv('resnet_confusion_matrix_with_accuracy_recall.csv', index=False)
+confusion_matrix_df.to_csv('resnet_confusion_matrix_with_glare_accuracy_recall.csv', index=False)
 
-print("Confusion matrix with accuracy and recall saved to resnet_confusion_matrix_with_accuracy_recall.csv")
+print("Confusion matrix with accuracy and recall saved to resnet_confusion_matrix_with_glare_accuracy_recall.csv")
 
 # Plot accuracy and recall over thresholds
 plt.figure(figsize=(12, 8))

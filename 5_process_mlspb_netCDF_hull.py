@@ -13,8 +13,11 @@ import re
 from scipy.spatial import ConvexHull, Delaunay
 
 # Paths and parameters
-parent_directory = r'E:\soc\l0c\2024\09\nc_files_with_mlsp'
-output_directory = r'E:\soc\l0c\2024\09\nc_files_with_mlspb'
+# parent_directory = r'E:\soc\l0c\2024\09\nc_files_with_mlsp'
+# output_directory = r'E:\soc\l0c\2024\09\nc_files_with_mlspb'
+
+parent_directory = 'nc_files_with_mlsp'
+output_directory = 'nc_files_with_mlspb'
 os.makedirs(output_directory, exist_ok=True)
 
 threshold = 0.3

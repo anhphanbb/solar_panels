@@ -14,10 +14,10 @@ import re
 from matplotlib.patches import Rectangle
 
 # Define the path to the parent directory where the dataset is located
-parent_directory = 'nc_files_with_mlsp'
+parent_directory = r'E:\GitHub\solar_panels\nc_files_with_mlsp'
 
 # Define the orbit number
-orbit_number = 1600  # orbit number
+orbit_number = 4486  # Orbit number
 
 # Pad the orbit number with zeros until it has 5 digits
 orbit_str = str(orbit_number).zfill(5)

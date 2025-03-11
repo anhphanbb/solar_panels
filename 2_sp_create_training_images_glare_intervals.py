@@ -20,7 +20,7 @@ import shutil
 space = 5
 
 # Path to the CSV file with filenames and intervals
-csv_file_path = 'csv/solar_panels_6x6_feb_22_2025.csv'
+csv_file_path = 'csv/solar_panels_6x6_mar_05_2025.csv'
 # parent_directory = 'l0c'
 parent_directory = r'Z:\soc\l0c'
 
@@ -67,11 +67,14 @@ grid_boxes = define_boxes()
 # Function to extract intervals per orbit and box from CSV data
 def extract_intervals_per_orbit(data):
     orbit_intervals = {}
+    glare_intervals = {}
     for _, row in data.iterrows():
         orbit = row['Orbit #']
         if pd.notna(orbit):
             orbit = int(orbit)
             orbit_intervals[orbit] = {}
+            if 'glare_initial' in row and 'glare_final' in row:
+                glare_intervals[orbit] = (row['glare_initial'], row['glare_final']) if pd.notna(row['glare_initial']) and pd.notna(row['glare_final']) else None
             for col in data.columns:
                 if "start" in col:
                     box = col.split("start")[0].strip()
@@ -83,7 +86,7 @@ def extract_intervals_per_orbit(data):
                             if box not in orbit_intervals[orbit]:
                                 orbit_intervals[orbit][box] = []
                             orbit_intervals[orbit][box].append((start, end))
-    return orbit_intervals
+    return orbit_intervals, glare_intervals
 
 # Function to search for .nc file in all subdirectories
 def find_nc_file(parent_directory, orbit_number):
@@ -132,7 +135,7 @@ def process_intervals_and_save_images(data, grid_boxes):
     no_sp_threshold = 8  # Frames outside the intervals, 8 frames away from the boundary is considered no_sp  # Number of images away from the boundary between sp and no sp
     sp_chance = 0.5
     no_sp_chance = 0.10  # Only save 1/10 of no sp images
-    orbit_intervals = extract_intervals_per_orbit(data)
+    orbit_intervals, glare_intervals = extract_intervals_per_orbit(data)
 
     # Add extra intervals manually
     extra_intervals = {
@@ -164,16 +167,18 @@ def process_intervals_and_save_images(data, grid_boxes):
         with Dataset(nc_file_path, 'r') as nc:
             radiance = nc.variables['Radiance'][:]
             num_frames = radiance.shape[0]
+            glare_range = glare_intervals.get(orbit_number, None)
             
             for box, intervals in boxes.items():
                 for i in range(space, num_frames - space):
+                    if glare_range and glare_range[0] <= i <= glare_range[1]:
+                        continue  # Ignore frames within the glare interval
                     for interval in intervals:
                         if interval[0] + sp_threshold <= i <= interval[1] - sp_threshold:
                             if random.random() < sp_chance:
                                 save_image(radiance, sp_folder, orbit_number, i, box, grid_boxes)
                         elif all(i < interval[0] - no_sp_threshold or i > interval[1] + no_sp_threshold for interval in intervals):
                             if random.random() < no_sp_chance:
-                                # print(f"Saving No-SP image: Orbit {orbit_number}, Box {box}, Frame {i}")
                                 save_image(radiance, no_sp_folder, orbit_number, i, box, grid_boxes)
 
 # Load data

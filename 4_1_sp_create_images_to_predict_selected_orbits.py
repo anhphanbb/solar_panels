@@ -24,7 +24,7 @@ output_folder = 'sp_images_to_predict'
 space = 5
 
 # List of specific orbits to process
-september_orbits_1 = list(range(4402, 4650, 1)) #4402 to 4649
+september_orbits_1 = list(range(4402, 4560, 1)) #4402 to 4559
 orbit_list = september_orbits_1
 
 # Ensure output folder exists

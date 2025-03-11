@@ -160,10 +160,13 @@ cython_debug/
 #.idea/
 
 # NetCDF files and images
-/models
-/l0b
-/nc_files_to_predict
-/training_images
-/sp_orbit_predictions
-/sp_images_to_predict
-/csv/AweSolarPanels
+models/
+l0b/
+nc_files_to_predict/
+training_images/
+csv/AweSolarPanels/
+glare_orbit_predictions/
+glare_training_images/
+sp_orbit_predictions/
+nc_files_with_mlsp/
+nc_files_with_mlspb/
