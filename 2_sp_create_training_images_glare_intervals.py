@@ -20,7 +20,7 @@ import shutil
 space = 5
 
 # Path to the CSV file with filenames and intervals
-csv_file_path = 'csv/solar_panels_6x6_mar_05_2025.csv'
+csv_file_path = 'csv/solar_panels_6x6_mar_10_2025.csv'
 # parent_directory = 'l0c'
 parent_directory = r'Z:\soc\l0c'
 
@@ -139,9 +139,11 @@ def process_intervals_and_save_images(data, grid_boxes):
 
     # Add extra intervals manually
     extra_intervals = {
-        113: {"(3,4)": [(1258, 1817)]},
+        # 113: {"(3,4)": [(1258, 1817)]},
         2450: {"(5,3)": [(1873, 1911)]},
-        2480: {"(5,3)": [(1840, 1863)]}
+        2480: {"(5,3)": [(1840, 1863)]},
+        4700: {"(5,3)": [(1827, 1892)]},
+        4730: {"(5,3)": [(1873, 1931)]}
     }
     
     for orbit, boxes in extra_intervals.items():
