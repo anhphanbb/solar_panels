@@ -168,5 +168,6 @@ csv/AweSolarPanels/
 glare_orbit_predictions/
 glare_training_images/
 sp_orbit_predictions/
+sp_images_to_predict/
 nc_files_with_mlsp/
 nc_files_with_mlspb/

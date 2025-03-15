@@ -14,7 +14,8 @@ import numpy as np
 import re
 
 # Input folder containing .nc files
-nc_folder = r'Z:\moc\l0b'
+# nc_folder = r'Z:\moc\l0b'
+nc_folder = r'E:\soc\l0c\2024\09'
 
 # Output folder to save prediction images
 output_folder = 'glare_images_to_predict'

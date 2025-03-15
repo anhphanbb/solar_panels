@@ -100,7 +100,7 @@ logdir = f'logs/resnet_model'
 tensorboard_callback = TensorBoard(log_dir=logdir)
 early_stopping_callback = EarlyStopping(
     monitor='val_loss',
-    patience=50,
+    patience=100,
     restore_best_weights=True
 )
 
@@ -108,7 +108,7 @@ start_time = time.time()
 
 hist = model.fit(
     train,
-    epochs=300,
+    epochs=500,
     validation_data=val,
     callbacks=[tensorboard_callback, early_stopping_callback]
 )
@@ -120,7 +120,7 @@ histories.append(hist)
 
 # Save the Model
 os.makedirs('models', exist_ok=True)
-model.save('models/tf_model_sp_acc_and_recall_mar_05_2025.h5')
+model.save('models/tf_model_py310_sp_acc_and_recall_mar_14_2025.h5')
 
 # Plot validation accuracy
 plt.figure(figsize=(12, 8))

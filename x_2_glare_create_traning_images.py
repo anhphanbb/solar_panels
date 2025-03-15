@@ -22,7 +22,7 @@ space = 3
 # Path to the CSV file with filenames and intervals
 csv_file_path = 'csv/AweGlareSeptember.csv'
 # Parent directory containing NetCDF files
-parent_directory = r'Z:\moc\l0b'
+parent_directory = r'E:\soc\l0c\2024\09'
 
 # Define output folders
 glare_folder = 'glare_training_images/class_1_glare'
@@ -66,7 +66,7 @@ def extract_intervals_per_orbit(data):
 
 def find_nc_file(parent_directory, orbit_number):
     orbit_str = str(int(orbit_number)).zfill(5)
-    pattern = re.compile(r'awe_l0b_q20_(.*)_' + orbit_str + r'_(.*)\.nc')
+    pattern = re.compile(r'awe_l0c_q20_(.*)_' + orbit_str + r'_(.*)\.nc')
     
     for root, dirs, files in os.walk(parent_directory):
         for file in files:

@@ -11,6 +11,7 @@ import numpy as np
 import pandas as pd
 import re
 import time
+import tensorflow as tf
 from tensorflow.keras.models import load_model
 from tensorflow.keras.applications.resnet50 import preprocess_input
 import shutil
@@ -22,27 +23,53 @@ input_folder = 'sp_images_to_predict'
 csv_output_folder = 'sp_orbit_predictions/csv'
 
 # Path to the pre-trained model
-model_path = 'models/tf_model_sp_acc_and_recall_mar_05_2025.h5'
+model_path = 'models/tf_model_sp_acc_and_recall_mar_13_2025.h5'
 
 # Ensure the output folder for CSV files exists
 os.makedirs(csv_output_folder, exist_ok=True)
 
+# XLA (Accelerated Linear Algebra) compiles TensorFlow graphs into optimized machine code for GPUs.
+# tf.config.optimizer.set_jit(True)  # Enable XLA for improved performance
+
 # Load the pre-trained model
 model = load_model(model_path)
 
+gpus = tf.config.experimental.list_physical_devices('GPU')
+if gpus:
+    try:
+        tf.config.experimental.set_virtual_device_configuration(
+            gpus[0],
+            [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=0)]
+        )
+
+        # for gpu in gpus:
+        #     tf.config.experimental.set_memory_growth(gpu, True)
+    except RuntimeError as e:
+        print(e)
+
+
 # Function to preprocess a batch of images for the model
+# def preprocess_images_batch(image_paths):
+#     """
+#     Preprocess a batch of images to match the model's expected input.
+#     Resize to (43, 43) and apply ResNet-50 preprocessing.
+#     """
+#     batch = []
+#     for image_path in image_paths:
+#         image = cv2.imread(image_path)  # Load image in RGB directly
+#         image_resized = cv2.resize(image, (43, 43))  # Resize to match training size
+#         image_preprocessed = preprocess_input(image_resized)  # Apply ResNet-50 preprocessing
+#         batch.append(image_preprocessed)
+#     return np.array(batch)  # Convert to a batch for prediction
+
+
+@tf.function
+def predict_batch(model, batch_images):
+    return model(batch_images, training=False)
+
 def preprocess_images_batch(image_paths):
-    """
-    Preprocess a batch of images to match the model's expected input.
-    Resize to (43, 43) and apply ResNet-50 preprocessing.
-    """
-    batch = []
-    for image_path in image_paths:
-        image = cv2.imread(image_path)  # Load image in RGB directly
-        image_resized = cv2.resize(image, (43, 43))  # Resize to match training size
-        image_preprocessed = preprocess_input(image_resized)  # Apply ResNet-50 preprocessing
-        batch.append(image_preprocessed)
-    return np.array(batch)  # Convert to a batch for prediction
+    images = np.array([cv2.resize(cv2.imread(img), (43, 43)) for img in image_paths])
+    return preprocess_input(images)  # Apply preprocessing to all at once
 
 # Function to compute running averages
 def compute_running_average(predictions, window_size):
@@ -90,7 +117,8 @@ def process_orbit_folder(orbit_folder, orbit_number, batch_size=32, avg_window_s
         batch_images = preprocess_images_batch(batch_image_paths)
 
         # Predict probabilities for the batch
-        probabilities = model.predict(batch_images, verbose=0).flatten()
+        # probabilities = model.predict(batch_images, verbose=0).flatten()
+        probabilities = predict_batch(model, batch_images).numpy().flatten()
 
         # Store results
         for frame_number, box, probability in zip(batch_frame_numbers, batch_boxes, probabilities):
@@ -100,7 +128,7 @@ def process_orbit_folder(orbit_folder, orbit_number, batch_size=32, avg_window_s
         print(f"Processed {start_idx + len(batch_data)}/{total_images} images in Orbit {orbit_number}...")
     
     # Remove images after processing
-    remove_orbit_images(orbit_folder)
+    # remove_orbit_images(orbit_folder)
 
     # Compute running averages for each box
     df_results = pd.DataFrame(results)
@@ -141,4 +169,4 @@ def process_all_orbits(input_folder, batch_size=32, avg_window_size=9):
                 process_orbit_folder(orbit_folder_path, orbit_number, batch_size=batch_size, avg_window_size=avg_window_size)
 
 # Run the script
-process_all_orbits(input_folder, batch_size=64, avg_window_size=1)
+process_all_orbits(input_folder, batch_size=2048, avg_window_size=1)
