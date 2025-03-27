@@ -20,7 +20,7 @@ import shutil
 space = 3
 
 # Path to the CSV file with filenames and intervals
-csv_file_path = 'csv/AweGlareSeptember.csv'
+csv_file_path = 'csv/AweGlareSeptemberLabeled.csv'
 # Parent directory containing NetCDF files
 parent_directory = r'E:\soc\l0c\2024\09'
 
@@ -97,19 +97,57 @@ def save_image(data, folder, orbit_number, frame_index, box):
         three_layer_image[..., 2] = next_frame_norm
     
     cropped_image = three_layer_image[y_start:y_end+1, x_start:x_end+1]
+
+    # Resize to 128x128
+    resized_image = cv2.resize(cropped_image, (256, 256), interpolation=cv2.INTER_AREA)
+
     file_path = os.path.join(folder, f"orbit{orbit_number}_frame{frame_index}.png")
-    cv2.imwrite(file_path, cropped_image)
+    cv2.imwrite(file_path, resized_image)
+
+# def process_intervals_and_save_images(data, full_image_box):
+#     glare_threshold = 2
+#     no_glare_threshold = 6
+#     glare_chance = 0.75
+#     no_glare_chance = 0.1
+#     orbit_intervals = extract_intervals_per_orbit(data)
+    
+#     for orbit_number, intervals in orbit_intervals.items():
+#         print(f"Processing orbit: {orbit_number}")
+#         print(f"Intervals: {intervals}")
+        
+#         try:
+#             nc_file_path = find_nc_file(parent_directory, orbit_number)
+#         except FileNotFoundError as e:
+#             print(e)
+#             continue
+        
+#         with Dataset(nc_file_path, 'r') as nc:
+#             radiance = nc.variables['Radiance'][:]
+#             num_frames = radiance.shape[0]
+            
+#             for i in range(space, num_frames - space):
+#                 for interval in intervals:
+#                     if interval[0] + glare_threshold <= i <= interval[1] - glare_threshold:
+#                         if random.random() < glare_chance:
+#                             save_image(radiance, glare_folder, orbit_number, i, full_image_box)
+#                     elif all(i < interval[0] - no_glare_threshold or i > interval[1] + no_glare_threshold for interval in intervals):
+#                         if random.random() < no_glare_chance:
+#                             save_image(radiance, no_glare_folder, orbit_number, i, full_image_box)
+
+# data = pd.read_csv(csv_file_path)
+# process_intervals_and_save_images(data, full_image_box)
 
 def process_intervals_and_save_images(data, full_image_box):
     glare_threshold = 3
-    no_glare_threshold = 8
-    glare_chance = 0.5
-    no_glare_chance = 0.05
-    orbit_intervals = extract_intervals_per_orbit(data)
-    
-    for orbit_number, intervals in orbit_intervals.items():
+    no_glare_threshold = 7
+    glare_chance = 1
+    no_glare_chance = 0.075
+
+    orbit_intervals = extract_intervals_per_orbit(data)  # Get labeled intervals
+    all_orbits = sorted(set(data['Orbit'].dropna().astype(int)))  # Get all unique orbits from CSV
+
+    for orbit_number in all_orbits:
         print(f"Processing orbit: {orbit_number}")
-        print(f"Intervals: {intervals}")
         
         try:
             nc_file_path = find_nc_file(parent_directory, orbit_number)
@@ -120,15 +158,17 @@ def process_intervals_and_save_images(data, full_image_box):
         with Dataset(nc_file_path, 'r') as nc:
             radiance = nc.variables['Radiance'][:]
             num_frames = radiance.shape[0]
+
+            intervals = orbit_intervals.get(orbit_number, [])  # Get intervals, empty list if none
+            print(intervals)
             
             for i in range(space, num_frames - space):
-                for interval in intervals:
-                    if interval[0] + glare_threshold <= i <= interval[1] - glare_threshold:
-                        if random.random() < glare_chance:
-                            save_image(radiance, glare_folder, orbit_number, i, full_image_box)
-                    elif all(i < interval[0] - no_glare_threshold or i > interval[1] + no_glare_threshold for interval in intervals):
-                        if random.random() < no_glare_chance:
-                            save_image(radiance, no_glare_folder, orbit_number, i, full_image_box)
+                if any(interval[0] + glare_threshold <= i <= interval[1] - glare_threshold for interval in intervals):
+                    if random.random() < glare_chance:
+                        save_image(radiance, glare_folder, orbit_number, i, full_image_box)
+                elif all(i < interval[0] - no_glare_threshold or i > interval[1] + no_glare_threshold for interval in intervals):
+                    if random.random() < no_glare_chance:
+                        save_image(radiance, no_glare_folder, orbit_number, i, full_image_box)
 
 data = pd.read_csv(csv_file_path)
 process_intervals_and_save_images(data, full_image_box)

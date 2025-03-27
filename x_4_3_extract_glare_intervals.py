@@ -17,14 +17,14 @@ import pandas as pd
 # Path to the folder containing prediction CSV files
 csv_folder = 'glare_orbit_predictions/csv'
 # Path to save the intervals CSV file
-output_csv_file = 'csv/glare_orbit_intervals.csv'
+output_csv_file = 'csv/glare_orbit_intervals_mar_16.csv'
 
 # Threshold for glare probability
-glare_threshold = 0.9
+glare_threshold = 0.01
 # Minimum consecutive frames required to form an interval
 min_consecutive_frames = 4
 # Extra frames to include before and after each interval
-extra_frames = 3
+extra_frames = 4
 
 # Function to find glare intervals in an orbit
 def find_glare_intervals(df):

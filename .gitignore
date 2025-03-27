@@ -171,3 +171,7 @@ sp_orbit_predictions/
 sp_images_to_predict/
 nc_files_with_mlsp/
 nc_files_with_mlspb/
+glare_images_to_predict/
+logs/
+sp_selected_orbits/
+sp_selected_orbits_no_glare

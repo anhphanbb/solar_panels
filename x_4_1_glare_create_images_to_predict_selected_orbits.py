@@ -32,7 +32,7 @@ os.makedirs(output_folder, exist_ok=True)
 
 def find_nc_file(parent_directory, orbit_number):
     orbit_str = str(int(orbit_number)).zfill(5)
-    pattern = re.compile(r'awe_l0b_q20_(.*)_' + orbit_str + r'_(.*)\.nc')
+    pattern = re.compile(r'awe_l0c_q20_(.*)_' + orbit_str + r'_(.*)\.nc')
     
     for root, dirs, files in os.walk(parent_directory):
         for file in files:

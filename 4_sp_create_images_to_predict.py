@@ -14,10 +14,10 @@ import numpy as np
 import re
 
 # Input folder containing .nc files
-nc_folder = 'sp_selected_orbits_no_glare'
+nc_folder = r'E:\soc\l0c\2024\09\no_glare'
 
 # Output folder to save prediction images
-output_folder = 'sp_images_to_predict'
+output_folder = r'E:\soc\l0c\2024\09\no_glare\sp_images_to_predict'
 
 # Number of frames before and after for consecutive image combination
 space = 5

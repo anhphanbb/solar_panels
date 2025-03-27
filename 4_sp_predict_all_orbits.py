@@ -17,19 +17,17 @@ from tensorflow.keras.applications.resnet50 import preprocess_input
 import shutil
 
 # Path to the folder containing orbit subfolders with images
-input_folder = 'sp_images_to_predict'
+input_folder = r'E:\soc\l0c\2024\09\no_glare\sp_images_to_predict'
 
 # Output folder for CSV results
 csv_output_folder = 'sp_orbit_predictions/csv'
 
 # Path to the pre-trained model
-model_path = 'models/tf_model_sp_acc_and_recall_mar_13_2025.h5'
+model_path = 'models/tf_model_py310_sp_acc_and_recall_mar_14_2025.h5'
 
 # Ensure the output folder for CSV files exists
 os.makedirs(csv_output_folder, exist_ok=True)
 
-# XLA (Accelerated Linear Algebra) compiles TensorFlow graphs into optimized machine code for GPUs.
-# tf.config.optimizer.set_jit(True)  # Enable XLA for improved performance
 
 # Load the pre-trained model
 model = load_model(model_path)
@@ -46,22 +44,6 @@ if gpus:
         #     tf.config.experimental.set_memory_growth(gpu, True)
     except RuntimeError as e:
         print(e)
-
-
-# Function to preprocess a batch of images for the model
-# def preprocess_images_batch(image_paths):
-#     """
-#     Preprocess a batch of images to match the model's expected input.
-#     Resize to (43, 43) and apply ResNet-50 preprocessing.
-#     """
-#     batch = []
-#     for image_path in image_paths:
-#         image = cv2.imread(image_path)  # Load image in RGB directly
-#         image_resized = cv2.resize(image, (43, 43))  # Resize to match training size
-#         image_preprocessed = preprocess_input(image_resized)  # Apply ResNet-50 preprocessing
-#         batch.append(image_preprocessed)
-#     return np.array(batch)  # Convert to a batch for prediction
-
 
 @tf.function
 def predict_batch(model, batch_images):
