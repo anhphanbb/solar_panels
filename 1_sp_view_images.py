@@ -13,16 +13,16 @@ import re
 
 # Define the path to the parent directory where the dataset is located
 # parent_directory = r'E:\GitHub\solar_panels\sp_selected_orbits_no_glare'
-parent_directory = r'E:\soc\l0c\2024\09\no_glare'
+parent_directory = r'E:\soc\l0c\2024\11'
 
 # Define the orbit number
-orbit_number = 4550  # orbit number
+orbit_number = 5471  # orbit number
 
 # Pad the orbit number with zeros until it has 5 digits
 orbit_str = str(orbit_number).zfill(5)
 
 # Search for the correct file name in all subdirectories
-pattern = re.compile(r'awe_l(.*)_' + orbit_str + r'_(.*)\.nc')
+pattern = re.compile(r'awe_l0c_q20(.*)_' + orbit_str + r'_(.*)\.nc')
 dataset_filename = None
 dataset_path = None
 

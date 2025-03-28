@@ -7,9 +7,9 @@ from netCDF4 import Dataset
 # Path to the CSV file with glare intervals
 csv_file_path = 'csv/glare_orbit_intervals.csv'
 # parent_directory = 'sp_selected_orbits'
-parent_directory = r'E:\soc\l0c\2024\09'
+parent_directory = r'E:\soc\l0c\2024\11'
 
-output_directory = r'E:\soc\l0c\2024\09\no_glare'
+output_directory = r'E:\soc\l0c\2024\11\no_glare'
 
 # Ensure output folder exists
 os.makedirs(output_directory, exist_ok=True)
@@ -82,6 +82,6 @@ glare_intervals = extract_glare_intervals(data)
 
 # Process all NetCDF files in the folder
 for file in os.listdir(parent_directory):
-    if file.endswith(".nc") and 'q20' in file:
+    if file.endswith(".nc"):# and 'q20' in file:
         nc_file_path = os.path.join(parent_directory, file)
         remove_glare_and_save(nc_file_path, glare_intervals, output_directory)
