@@ -13,11 +13,11 @@ import re
 
 # Define input and output folders
 # nc_input_folder = r'E:\soc\l0c\2024\09'
-nc_input_folder = r'E:\soc\l0c\2024\09\no_glare'
+nc_input_folder = r'E:\soc\l0c\2024\11'
 
 csv_predictions_folder = 'sp_orbit_predictions/csv'
 
-nc_output_folder = r'E:\soc\l0c\2024\09\no_glare\nc_files_with_mlsp'
+nc_output_folder = r'E:\soc\l0c\2024\11\nc_files_with_mlsp'
 # nc_output_folder = r'E:\soc\l0c\2024\09\nc_files_with_mlsp'
 
 # Ensure the output folder exists
@@ -41,33 +41,25 @@ box_mapping = {
 def extract_orbit_number(filename):
     return filename.split('_')[4]
 
-# Function to create a new NetCDF file with the MLSP variable
 def add_mlsp_to_nc_file(input_file_path, output_file_path, mlsp_data):
     with Dataset(input_file_path, 'r') as src_nc, Dataset(output_file_path, 'w', format=src_nc.file_format) as dst_nc:
         # Copy global attributes
         dst_nc.setncatts({attr: src_nc.getncattr(attr) for attr in src_nc.ncattrs()})
         
-        # Copy dimensions
-        for name, dimension in src_nc.dimensions.items():
-            dst_nc.createDimension(name, (len(dimension) if not dimension.isunlimited() else None))
+        # Copy only the 'time' dimension
+        dst_nc.createDimension('time', len(src_nc.dimensions['time']))
         
         # Add new dimensions for MLSP
         dst_nc.createDimension('y_box_across_track', 6)
         dst_nc.createDimension('x_box_along_track', 6)
         
-        # Copy variables
-        for name, variable in src_nc.variables.items():
-            new_var = dst_nc.createVariable(name, variable.datatype, variable.dimensions)
-            new_var[:] = variable[:]
-            new_var.setncatts({attr: variable.getncattr(attr) for attr in variable.ncattrs()})
-        
         # Add the MLSP variable
-        mlsp_var = dst_nc.createVariable('MLSP', 'f4', ('time', 'y_box_across_track', 'x_box_along_track'), zlib=True)
+        mlsp_var = dst_nc.createVariable('MLSP', 'f4', ('time', 'y_box_across_track', 'x_box_along_track'), zlib=True, complevel=4)
         
         # Write MLSP data
         mlsp_var[:] = mlsp_data
         
-        print(f"Created file with MLSP variable: {output_file_path}")
+        print(f"Created file with ONLY MLSP variable: {output_file_path}")
 
 # Main script to process all files
 for file_name in os.listdir(nc_input_folder):
