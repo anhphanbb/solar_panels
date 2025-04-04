@@ -15,9 +15,9 @@ import re
 from scipy.spatial import ConvexHull, Delaunay
 
 # Input/output paths
-original_nc_folder = r'E:\soc\l0c\2024\11'  # Original variables
-mlsp_nc_folder = r'E:\soc\l0c\2024\11\nc_files_with_mlsp'  # Contains MLSP only
-output_directory = r'E:\soc\l0c\2024\11\nc_files_with_mlspb'
+original_nc_folder = r'E:\soc\l0c\2024\12'  # Original variables
+mlsp_nc_folder = r'E:\soc\l0c\2024\12\nc_files_with_mlsp'  # Contains MLSP only
+output_directory = r'E:\soc\l0d\2024\12'
 os.makedirs(output_directory, exist_ok=True)
 
 threshold = 0.3
@@ -90,7 +90,11 @@ def select_and_expand_clusters(thresholded, mlsp, expansion_factor):
         print(f"Cluster {i+1} Expanded Dimensions (t: {combined_points[:,0].min(), combined_points[:,0].max()}, y: {combined_points[:,1].min(), combined_points[:,1].max()}, x: {combined_points[:,2].min(), combined_points[:,2].max()})")
 
         mlspb[tuple(combined_points.T)] = 1
-
+        
+    # Set all boxes in the first and last frames to 1
+    # mlspb[0, :, :] = 1
+    # mlspb[-1, :, :] = 1
+    
     return mlspb
 
 # Main processing loop
@@ -116,6 +120,9 @@ for file in os.listdir(mlsp_nc_folder):
                 # Copy dimensions
                 for name, dim in orig_ds.dimensions.items():
                     new_ds.createDimension(name, len(dim) if not dim.isunlimited() else None)
+                    
+                # Copy global attributes
+                new_ds.setncatts({attr: orig_ds.getncattr(attr) for attr in orig_ds.ncattrs()})
 
                 # Copy variables with chunking and compression
                 for name, var in orig_ds.variables.items():

@@ -3,15 +3,15 @@ import shutil
 import re
 
 # Define source and destination directories
-src_dir = r"Z:\soc\l0c\2024\11"
-dst_dir = r"E:\soc\l0c\2024\11"
+src_dir = r"Z:\soc\l0c\2024\12"
+dst_dir = r"E:\soc\l0c\2024\12"
 
 # Create the destination directory if it doesn't exist
 os.makedirs(dst_dir, exist_ok=True)
 
 # Define orbit range
-min_orbit = 5346
-max_orbit = 5500
+min_orbit = 5833
+max_orbit = 5970
 
 # Regex pattern to extract orbit number before '_v01'
 pattern = re.compile(r'_([0-9]{5})_v01\.nc$')
