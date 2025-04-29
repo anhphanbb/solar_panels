@@ -7,9 +7,9 @@ from netCDF4 import Dataset
 # Path to the CSV file with glare intervals
 csv_file_path = 'csv/glare_orbit_intervals.csv'
 # Parent directory with NetCDF files
-parent_directory = r'E:\soc\l0c\2024\12'
+parent_directory = r'E:\soc\l0c\2025\01'
 # Output directory to save files with glare removed
-output_directory = r'E:\soc\l0c\2024\12\no_glare'
+output_directory = r'E:\soc\l0c\2025\01\no_glare'
 
 # Ensure output folder exists
 os.makedirs(output_directory, exist_ok=True)

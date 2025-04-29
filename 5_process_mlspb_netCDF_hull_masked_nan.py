@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """
 Save MLSP > threshold binary values of the two largest clusters into new NetCDF files with expansion.
+Apply mask to set NaN in Radiance, Latitude, and Longitude variables.
+
 Reads from 2 NetCDF files: one with original variables, one with MLSP only.
 Applies compression and retains original chunk sizes.
 Processes files in parallel.
@@ -17,8 +19,8 @@ from scipy.spatial import ConvexHull, Delaunay
 from concurrent.futures import ProcessPoolExecutor, as_completed
 
 # Paths and settings
-original_nc_folder = r'E:\soc\l0c\2025\01'
-mlsp_nc_folder = r'E:\soc\l0c\2025\01\nc_files_with_mlsp'
+original_nc_folder = r'E:\soc\l0c\2025\01_original'
+mlsp_nc_folder = r'E:\soc\l0c\2025\01_original\nc_files_with_mlsp'
 output_directory = r'E:\soc\l0d\2025\01'
 os.makedirs(output_directory, exist_ok=True)
 
@@ -26,6 +28,9 @@ threshold = 0.3
 running_average_window = 5
 expansion_factor = 1.5
 pattern = re.compile(r'awe_l(.*)_(\d{5})_(.*)\.nc')
+
+# Predefine box boundaries
+box_ranges = [(0, 42), (43, 85), (86, 128), (129, 171), (172, 214), (215, 256)]
 
 def calculate_running_average(data, window_size):
     kernel = np.ones(window_size) / window_size
@@ -78,37 +83,46 @@ def select_and_expand_clusters(thresholded, mlsp, expansion_factor):
         selected_clusters = [largest_end_last[0]]
 
     mlspb = np.zeros_like(labeled_array, dtype=np.uint8)
-    for i, cluster_id in enumerate(selected_clusters):
+    for cluster_id in selected_clusters:
         cluster_mask = labeled_array == cluster_id
         z, y, x = np.where(cluster_mask)
         cluster_points = np.column_stack((z, y, x))
 
-        print(f"Cluster {i+1}: Initial size = {len(cluster_points)} points")
-        print(f"Cluster {i+1} Initial Dimensions (t: {(z.min(), z.max())}, y: {(y.min(), y.max())}, x: {(x.min(), x.max())})")
-
         combined_points = expand_cluster_points(cluster_points, mlsp, expansion_factor)
-
-        print(f"Cluster {i+1}: Final size after expansion = {len(combined_points)} points")
-        print(f"Cluster {i+1} Expanded Dimensions (t: {combined_points[:,0].min(), combined_points[:,0].max()}, y: {combined_points[:,1].min(), combined_points[:,1].max()}, x: {combined_points[:,2].min(), combined_points[:,2].max()})")
-
         mlspb[tuple(combined_points.T)] = 1
-    
+
     return mlspb
+
+def create_nan_indices(mlspb):
+    # Apply corner rule per time step
+    mlspb = mlspb.copy()
+    for t in range(mlspb.shape[0]):
+        if mlspb[t,0,4] == 1 or mlspb[t,1,4] == 1 or mlspb[t,1,5] == 1:
+            mlspb[t,0,5] = 1
+        if mlspb[t,4,4] == 1 or mlspb[t,4,5] == 1 or mlspb[t,5,4] == 1:
+            mlspb[t,5,5] = 1
+
+    nan_indices = []
+    for i_y, (y_start, y_end) in enumerate(box_ranges):
+        for i_x, (x_start, x_end) in enumerate(box_ranges):
+            box = mlspb[:, i_y, i_x]
+            times = np.where(box == 1)[0]
+            for t in times:
+                nan_indices.append((t, slice(y_start, y_end+1), slice(x_start, x_end+1)))
+    return nan_indices
 
 def process_file(file):
     if not pattern.match(file):
         return
 
     mlsp_path = os.path.join(mlsp_nc_folder, file)
-    original_path = os.path.join(original_nc_folder, file.replace('l0c', 'l0c'))
-    output_path = os.path.join(output_directory, file.replace('l0c', 'l0c'))
 
-    if not os.path.exists(original_path):
-        print(f"Original file not found: {original_path}")
+    if not os.path.exists(mlsp_path):
+        print(f"MLSP file not found: {mlsp_path}")
         return
 
     try:
-        with Dataset(original_path, 'r') as orig_ds, Dataset(mlsp_path, 'r') as mlsp_ds:
+        with Dataset(mlsp_path, 'r') as mlsp_ds:
             mlsp = mlsp_ds.variables['MLSP'][:]
             mlsp[:, :, :3] = 0  # Remove solar panel glare
 
@@ -116,42 +130,69 @@ def process_file(file):
             thresholded = averaged_mlsp > threshold
             mlspb = select_and_expand_clusters(thresholded, averaged_mlsp, expansion_factor)
 
-            with Dataset(output_path, 'w', format='NETCDF4') as new_ds:
-                # Copy dimensions
-                for name, dim in orig_ds.dimensions.items():
-                    new_ds.createDimension(name, len(dim) if not dim.isunlimited() else None)
+            nan_indices = create_nan_indices(mlspb)
 
-                # Copy global attributes
-                new_ds.setncatts({attr: orig_ds.getncattr(attr) for attr in orig_ds.ncattrs()})
+            # Process all 4 versions: bkg, p12, p14, q20
+            versions = ['bkg', 'p12', 'p14', 'q20']
+            for version in versions:
+                original_file = file.replace('q20', version)
+                original_path = os.path.join(original_nc_folder, original_file)
+                output_path = os.path.join(output_directory, original_file)
 
-                # Copy variables with original chunks and compression
-                for name, var in orig_ds.variables.items():
-                    if name != 'MLSP':
+                if not os.path.exists(original_path):
+                    print(f"Original file not found: {original_path}")
+                    continue
+
+                with Dataset(original_path, 'r') as orig_ds, Dataset(output_path, 'w', format='NETCDF4') as new_ds:
+                    # Copy dimensions
+                    for name, dim in orig_ds.dimensions.items():
+                        new_ds.createDimension(name, len(dim) if not dim.isunlimited() else None)
+
+                    # Copy global attributes
+                    new_ds.setncatts({attr: orig_ds.getncattr(attr) for attr in orig_ds.ncattrs()})
+
+                    # Copy variables
+                    for name, var in orig_ds.variables.items():
                         chunksizes = var.chunking() if var.chunking() else None
                         new_var = new_ds.createVariable(name, var.datatype, var.dimensions, chunksizes=chunksizes, zlib=True, complevel=4)
-                        new_var[:] = var[:]
+
+                        data = var[:]
+                        if name in ['Radiance', 'Latitude', 'Longitude']:
+                            for idx in nan_indices:
+                                data[idx] = np.nan
+
+                        new_var[:] = data
                         new_var.setncatts({attr: var.getncattr(attr) for attr in var.ncattrs()})
+                        
+                    # Before creating MLSPB
+                    mlspb_dims = mlsp_ds.variables['MLSP'].dimensions
+                    for dim in mlspb_dims:
+                        if dim not in new_ds.dimensions:
+                            if dim == 'y_box_across_track':
+                                new_ds.createDimension(dim, 6)  # manually set 6
+                            elif dim == 'x_box_along_track':
+                                new_ds.createDimension(dim, 6)  # manually set 6
+                            else:
+                                new_ds.createDimension(dim, mlsp_ds.dimensions[dim].size)
+    
+                    # Save MLSPB
+                    mlspb_var = new_ds.createVariable('MLSPB', 'u1', mlsp_ds.variables['MLSP'].dimensions, zlib=True, complevel=4)
+                    mlspb_var.setncatts({'description': f'Binary MLSP > {threshold}, expanded clusters touching frame 0 or last'})
+                    mlspb_var[:] = mlspb
 
-                # Ensure MLSP dimensions are in new file
-                for dim in mlsp_ds.variables['MLSP'].dimensions:
-                    if dim not in new_ds.dimensions:
-                        new_ds.createDimension(dim, mlsp_ds.dimensions[dim].size)
 
-                mlspb_var = new_ds.createVariable('MLSPB', 'u1', mlsp_ds.variables['MLSP'].dimensions, zlib=True, complevel=4)
-                mlspb_var.setncatts({'description': f'Binary MLSP > {threshold}, expanded clusters touching frame 0 or last'})
-                mlspb_var[:] = mlspb
+                print(f"Finished: {output_path}")
 
-        print(f"Finished: {output_path}")
     except Exception as e:
         print(f"Error processing {file}: {e}")
 
 if __name__ == "__main__":
     files_to_process = [f for f in os.listdir(mlsp_nc_folder) if pattern.match(f)]
-    max_workers = min(8, os.cpu_count())  # Adjust as needed
+    max_workers = min(16, os.cpu_count())
 
     with ProcessPoolExecutor(max_workers=max_workers) as executor:
         futures = {executor.submit(process_file, f): f for f in files_to_process}
         for future in as_completed(futures):
-            future.result()  # Raise exception if occurred
+            future.result()
 
     print("All processing completed.")
