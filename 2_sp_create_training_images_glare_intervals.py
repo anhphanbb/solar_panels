@@ -133,8 +133,8 @@ def save_image(data, folder, orbit_number, frame_index, box_idx, boxes):
 def process_intervals_and_save_images(data, grid_boxes):
     sp_threshold = 4  # Frames inside the intervals, 4 frames away from the boundary is considered sp
     no_sp_threshold = 8  # Frames outside the intervals, 8 frames away from the boundary is considered no_sp  # Number of images away from the boundary between sp and no sp
-    sp_chance = 1
-    no_sp_chance = 0.50  # Only save 1/10 of no sp images
+    sp_chance = .75
+    no_sp_chance = 0.20  # Only save 2/10 of no sp images
     orbit_intervals, glare_intervals = extract_intervals_per_orbit(data)
 
     # Add extra intervals manually

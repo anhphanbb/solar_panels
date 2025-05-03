@@ -4,7 +4,7 @@ Created on Mon Dec  2 18:51:37 2024
 
 @author: Anh
 
-Update Apr 29 2025: Generate MLSPB variable and save updated NetCDF files.
+Update Apr 29 2025: Generate MLSPB variable from the csv file and save updated NetCDF files.
 """
 
 import pandas as pd

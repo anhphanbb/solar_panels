@@ -120,7 +120,7 @@ histories.append(hist)
 
 # Save the Model
 os.makedirs('models', exist_ok=True)
-model.save('models/tf_model_py310_sp_acc_and_recall_april_29_2025.h5')
+model.save('models/tf_model_py310_sp_acc_and_recall_april_29_soc1_2025.h5')
 
 # Plot validation accuracy
 plt.figure(figsize=(12, 8))

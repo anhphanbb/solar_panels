@@ -74,5 +74,5 @@ for filename in os.listdir(folder_labels):
 
 # Save to CSV
 df = pd.DataFrame(results)
-df.to_csv('csv/mlspb_comparison_results_april_29_2025.csv', index=False)
-print("Saved results to csv/mlspb_comparison_results.csv")
+df.to_csv('csv/mlspb_comparison_results_april_29_2025_soc1.csv', index=False)
+print("Saved results to csv/mlspb_comparison_results_april_29_2025_soc1.csv")
