@@ -20,9 +20,9 @@ import shutil
 space = 3
 
 # Path to the CSV file with filenames and intervals
-csv_file_path = 'csv/AweGlareSeptemberLabeled.csv'
+csv_file_path = 'csv/glare_orbit_intervals_demo.csv'
 # Parent directory containing NetCDF files
-parent_directory = r'E:\soc\l0c\2024\09'
+parent_directory = r'E:\soc\l0c\2025\02'
 
 # Define output folders
 glare_folder = 'glare_training_images/class_1_glare'
@@ -66,7 +66,7 @@ def extract_intervals_per_orbit(data):
 
 def find_nc_file(parent_directory, orbit_number):
     orbit_str = str(int(orbit_number)).zfill(5)
-    pattern = re.compile(r'awe_l0c_q20_(.*)_' + orbit_str + r'_(.*)\.nc')
+    pattern = re.compile(r'awe_l0c_bkg_(.*)_' + orbit_str + r'_(.*)\.nc')
     
     for root, dirs, files in os.walk(parent_directory):
         for file in files:
@@ -98,8 +98,8 @@ def save_image(data, folder, orbit_number, frame_index, box):
     
     cropped_image = three_layer_image[y_start:y_end+1, x_start:x_end+1]
 
-    # Resize to 128x128
-    resized_image = cv2.resize(cropped_image, (256, 256), interpolation=cv2.INTER_AREA)
+    # Resize to 64x64
+    resized_image = cv2.resize(cropped_image, (64, 64), interpolation=cv2.INTER_AREA)
 
     file_path = os.path.join(folder, f"orbit{orbit_number}_frame{frame_index}.png")
     cv2.imwrite(file_path, resized_image)

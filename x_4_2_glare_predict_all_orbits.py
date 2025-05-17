@@ -23,7 +23,7 @@ input_folder = 'glare_images_to_predict'
 csv_output_folder = 'glare_orbit_predictions/csv'
 
 # Path to the pre-trained model
-model_path = 'models/resnet_model_glare_acc_and_recall_march_16_2025.h5'
+model_path = 'models/resnet_model_glare_acc_and_recall_demo.h5'
 
 # Ensure the output folder for CSV files exists
 os.makedirs(csv_output_folder, exist_ok=True)
@@ -53,7 +53,7 @@ def preprocess_images_batch(image_paths):
     Preprocess a batch of images to match the model's expected input.
     Resize to (256, 256) and apply ResNet-50 preprocessing.
     """
-    images = np.array([cv2.resize(cv2.imread(img), (256, 256)) for img in image_paths])
+    images = np.array([cv2.resize(cv2.imread(img), (64, 64)) for img in image_paths])
     return preprocess_input(images)
 
 

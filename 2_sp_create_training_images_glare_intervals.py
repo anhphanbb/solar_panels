@@ -20,7 +20,7 @@ import shutil
 space = 5
 
 # Path to the CSV file with filenames and intervals
-csv_file_path = 'csv/solar_panels_6x6_april_29_2025.csv'
+csv_file_path = 'csv/solar_panels_6x6_may_16_2025.csv'
 # parent_directory = 'l0c'
 parent_directory = r'Z:\soc\l0c'
 
@@ -131,10 +131,10 @@ def save_image(data, folder, orbit_number, frame_index, box_idx, boxes):
 
 # Main function to process intervals and save images
 def process_intervals_and_save_images(data, grid_boxes):
-    sp_threshold = 4  # Frames inside the intervals, 4 frames away from the boundary is considered sp
+    sp_threshold = 2  # Frames inside the intervals, 2 frames away from the boundary is considered sp
     no_sp_threshold = 8  # Frames outside the intervals, 8 frames away from the boundary is considered no_sp  # Number of images away from the boundary between sp and no sp
-    sp_chance = .75
-    no_sp_chance = 0.20  # Only save 2/10 of no sp images
+    sp_chance = .5
+    no_sp_chance = 0.1  # Only save 2/10 of no sp images
     orbit_intervals, glare_intervals = extract_intervals_per_orbit(data)
 
     # Add extra intervals manually

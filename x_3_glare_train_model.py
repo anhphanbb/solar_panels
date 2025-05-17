@@ -38,7 +38,7 @@ def augment(image):
     return image
 
 # Set new image size based on bounding box dimensions
-new_image_size = (256, 256)
+new_image_size = (64, 64)
 
 # Load Data and Resize
 data = tf.keras.utils.image_dataset_from_directory(
@@ -118,7 +118,7 @@ histories.append(hist)
 
 # Save the Model
 os.makedirs('models', exist_ok=True)
-model.save('models/resnet_model_glare_acc_and_recall_march_16_2025.h5')
+model.save('models/resnet_model_glare_acc_and_recall_demo.h5')
 
 # Plot validation accuracy
 plt.figure(figsize=(12, 8))

@@ -15,7 +15,7 @@ import re
 
 # Input folder containing .nc files
 # nc_folder = r'Z:\moc\l0b'
-nc_folder = r'E:\soc\l0c\2024\09'
+nc_folder = r'E:\soc\l0c\2025\02'
 
 # Output folder to save prediction images
 output_folder = 'glare_images_to_predict'
@@ -24,7 +24,7 @@ output_folder = 'glare_images_to_predict'
 space = 3
 
 # List of specific orbits to process
-september_orbits_1 = list(range(4402, 4561, 1)) #4402 to 4560
+september_orbits_1 = list(range(6810, 6840, 1)) 
 orbit_list = september_orbits_1
 
 # Ensure output folder exists
@@ -32,7 +32,7 @@ os.makedirs(output_folder, exist_ok=True)
 
 def find_nc_file(parent_directory, orbit_number):
     orbit_str = str(int(orbit_number)).zfill(5)
-    pattern = re.compile(r'awe_l0c_q20_(.*)_' + orbit_str + r'_(.*)\.nc')
+    pattern = re.compile(r'awe_l0c_bkg_(.*)_' + orbit_str + r'_(.*)\.nc')
     
     for root, dirs, files in os.walk(parent_directory):
         for file in files:
@@ -77,8 +77,10 @@ def create_images_from_nc_file(nc_file_path, full_image_box, output_folder, spac
             y_start, y_end = full_image_box['y']
 
             cropped_image = three_layer_image[y_start:y_end+1, x_start:x_end+1]
+            resized_image = cv2.resize(cropped_image, (64, 64), interpolation=cv2.INTER_AREA)
+            
             file_path = os.path.join(orbit_output_folder, f"frame_{i}.png")
-            cv2.imwrite(file_path, cropped_image)
+            cv2.imwrite(file_path, resized_image)
 
 # Process selected orbits
 def process_selected_orbits(parent_directory, output_folder, full_image_box, space, orbit_list):

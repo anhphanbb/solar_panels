@@ -55,6 +55,9 @@ data = data.map(lambda x, y: (augment(x), y))
 # Further preprocessing for ResNet-50
 data = data.map(lambda x, y: (preprocess_input(x), y))
 
+# Shuffle the dataset first
+data = data.shuffle(buffer_size=1000, seed=42, reshuffle_each_iteration=False)
+
 # Split Data
 data_size = data.cardinality().numpy()
 train_size = int(data_size * 0.7)
@@ -108,7 +111,7 @@ start_time = time.time()
 
 hist = model.fit(
     train,
-    epochs=500,
+    epochs=800,
     validation_data=val,
     callbacks=[tensorboard_callback, early_stopping_callback]
 )
@@ -120,7 +123,7 @@ histories.append(hist)
 
 # Save the Model
 os.makedirs('models', exist_ok=True)
-model.save('models/tf_model_py310_sp_acc_and_recall_april_29_soc1_2025.h5')
+model.save('models/tf_model_py310_sp_acc_and_recall_may_16_soc1_2025.h5')
 
 # Plot validation accuracy
 plt.figure(figsize=(12, 8))

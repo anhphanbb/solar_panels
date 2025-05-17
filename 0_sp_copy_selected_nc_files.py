@@ -3,15 +3,15 @@ import shutil
 import re
 
 # Define source and destination directories
-src_dir = r"Z:\soc\l0c\2025\02"
-dst_dir = r"E:\soc\l0c\2025\02"
+src_dir = r"Z:\soc\l0c\2025\03"
+dst_dir = r"E:\soc\l0c\2025\03"
 
 # Create the destination directory if it doesn't exist
 os.makedirs(dst_dir, exist_ok=True)
 
 # Define orbit range
-min_orbit = 6772
-max_orbit = 6916
+min_orbit = 7206
+max_orbit = 7338
 
 # Regex pattern to extract orbit number before '_v01'
 pattern = re.compile(r'_([0-9]{5})_v01\.nc$')
@@ -19,6 +19,7 @@ pattern = re.compile(r'_([0-9]{5})_v01\.nc$')
 # Loop through files and filter
 for filename in os.listdir(src_dir):
     match = pattern.search(filename)
+    # if match and 'bkg' in filename:
     if match:
         orbit_num = int(match.group(1))
         if min_orbit <= orbit_num <= max_orbit:
