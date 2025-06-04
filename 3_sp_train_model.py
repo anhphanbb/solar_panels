@@ -56,7 +56,7 @@ data = data.map(lambda x, y: (augment(x), y))
 data = data.map(lambda x, y: (preprocess_input(x), y))
 
 # Shuffle the dataset first
-data = data.shuffle(buffer_size=1000, seed=42, reshuffle_each_iteration=False)
+data = data.shuffle(buffer_size=500000, seed=42, reshuffle_each_iteration=False)
 
 # Split Data
 data_size = data.cardinality().numpy()
