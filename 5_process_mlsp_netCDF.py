@@ -13,11 +13,11 @@ import re
 
 # Define input and output folders
 # nc_input_folder = r'E:\soc\l0c\2024\09'
-nc_input_folder = r'E:\soc\l0c\2025\05'
+nc_input_folder = r'E:\soc\l0c\2025\04'
 
 csv_predictions_folder = 'sp_orbit_predictions/csv'
 
-nc_output_folder = r'E:\soc\l0c\2025\05\nc_files_with_mlsp'
+nc_output_folder = r'E:\soc\l0c\2025\04\nc_files_with_mlsp'
 # nc_output_folder = r'E:\soc\l0c\2024\09\nc_files_with_mlsp'
 
 # Ensure the output folder exists
