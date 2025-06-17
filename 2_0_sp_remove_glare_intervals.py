@@ -6,11 +6,11 @@ from netCDF4 import Dataset
 from concurrent.futures import ProcessPoolExecutor, as_completed
 
 # Path to the CSV file with glare intervals
-csv_file_path = 'csv/glare_orbit_intervals_april_2025_bkg.csv'
+csv_file_path = 'csv/glare_orbit_intervals_may_2025_bkg.csv'
 # Parent directory with NetCDF files
-parent_directory = r'E:\soc\l0c\2025\04'
+parent_directory = r'E:\soc\l0c\2025\05'
 # Output directory to save files with glare removed
-output_directory = r'E:\soc\l0c\2025\04\no_glare'
+output_directory = r'E:\soc\l0c\2025\05\no_glare'
 
 # Ensure output folder exists
 os.makedirs(output_directory, exist_ok=True)
@@ -63,10 +63,22 @@ def remove_glare_and_save(nc_file_path, glare_intervals):
                     new_nc.createDimension(dim, size)
             
             for var_name, var in variables.items():
+                # Adjust chunking to avoid exceeding dimensions
+                original_chunks = var.chunking() if var.chunking() != 'contiguous' else None
+                safe_chunks = None
+                if original_chunks:
+                    safe_chunks = tuple(
+                        min(dim_size if dim != 'time' else len(keep_indices), chunk)
+                        for dim, chunk, dim_size in zip(var.dimensions, original_chunks,
+                                                        [len(keep_indices) if d == 'time' else dimensions[d] for d in var.dimensions])
+                    )
+                
                 new_var = new_nc.createVariable(
-                    var_name, var.datatype, var.dimensions,
+                    var_name,
+                    var.datatype,
+                    var.dimensions,
                     zlib=var.filters().get('zlib', False),
-                    chunksizes=var.chunking() if var.chunking() != 'contiguous' else None
+                    chunksizes=safe_chunks
                 )
                 new_var.setncatts({attr: var.getncattr(attr) for attr in var.ncattrs()})
                 
