@@ -15,10 +15,10 @@ import re
 from concurrent.futures import ProcessPoolExecutor, as_completed
 
 # Input folder containing .nc files
-nc_folder = r'E:\soc\l0c\2025\04'
+nc_folder = r'E:\soc\l0c\2025\05'
 
 # Output folder to save prediction images
-output_folder = r'E:\soc\l0c\2025\04\sp_images_to_predict'
+output_folder = r'E:\soc\l0c\2025\05\sp_images_to_predict'
 
 # Number of frames before and after for consecutive image combination
 space = 5
