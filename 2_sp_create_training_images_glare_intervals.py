@@ -20,7 +20,7 @@ import shutil
 space = 5
 
 # Path to the CSV file with filenames and intervals
-csv_file_path = 'csv/solar_panels_6x6_may_16_2025.csv'
+csv_file_path = 'csv/solar_panels_6x6_july_26_2025.csv'
 # parent_directory = 'l0c'
 parent_directory = r'Z:\soc\l0c'
 
@@ -134,7 +134,7 @@ def process_intervals_and_save_images(data, grid_boxes):
     sp_threshold = 2  # Frames inside the intervals, 2 frames away from the boundary is considered sp
     no_sp_threshold = 8  # Frames outside the intervals, 8 frames away from the boundary is considered no_sp  # Number of images away from the boundary between sp and no sp
     sp_chance = .5
-    no_sp_chance = 0.1  # Only save 2/10 of no sp images
+    no_sp_chance = 0.055  # Only save 5.5% of no sp images
     orbit_intervals, glare_intervals = extract_intervals_per_orbit(data)
 
     # Add extra intervals manually
@@ -152,7 +152,37 @@ def process_intervals_and_save_images(data, grid_boxes):
         6440: {"(5,3)": [(1838, 1862)]},
         6470: {"(5,3)": [(1852, 1878)]},
         6500: {"(5,3)": [(1838, 1892)]},
-        6560: {"(5,3)": [(1900, 1930)]}
+        6560: {"(5,3)": [(1900, 1930)]}, 
+        7490: {"(5,3)": [(1867, 1881)]}, 
+        7520: {"(5,3)": [(1895, 1910)]}, 
+        8030: {"(5,3)": [(1909, 1933)]},
+        8060: {"(5,3)": [(1879, 1923)]},
+        8090: {"(5,3)": [(1839, 1878)]},
+        8120: {"(5,3)": [(1821, 1853)]},
+        630: {"(5,3)": [(1918, 1927)]},
+        660: {"(5,3)": [(1903, 1913)]},
+        690: {"(5,3)": [(1855, 1880)]},
+        720: {"(5,3)": [(1860, 1873)]},
+        750: {"(5,3)": [(1848, 1860)]},
+        780: {"(5,3)": [(1825, 1841)]},
+        810: {"(5,3)": [(1842, 1854)]},
+        840: {"(5,3)": [(1865, 1888)]},
+        870: {"(5,3)": [(1741, 1770)]},
+        900: {"(5,3)": [(1913, 1927)]},
+        1230: {"(3,4)": [(638, 675)]},
+        2840: {"(5,3)": [(1824, 1867)]},
+        2990: {"(4,2)": [(102, 144)]},
+        3200: {"(3,4)": [(1280, 1853)]},
+        3350: {"(5,3)": [(1897, 1920)]},
+        3380: {"(5,3)": [(1857, 1894)]},
+        3410: {"(5,3)": [(1801, 1823)]},
+        3770: {"(5,3)": [(1822, 1851)]},
+        3800: {"(5,3)": [(1870, 1913)]},
+        3830: {"(5,3)": [(1905, 1931)]},
+        4310: {"(5,3)": [(1894, 1917)]},
+        4340: {"(3,4)": [(1894, 1917)]},
+        4370: {"(5,3)": [(1827, 1954)]},
+        
     }
     
     for orbit, boxes in extra_intervals.items():

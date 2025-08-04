@@ -30,9 +30,9 @@ if gpus:
 
 # Define your data augmentation pipeline
 def augment(image):
-    image = tf.image.random_flip_left_right(image)
-    image = tf.image.random_flip_up_down(image)
-    image = tf.image.rot90(image, k=tf.random.uniform(shape=[], minval=0, maxval=4, dtype=tf.int32))
+    # image = tf.image.random_flip_left_right(image)
+    # image = tf.image.random_flip_up_down(image)
+    # image = tf.image.rot90(image, k=tf.random.uniform(shape=[], minval=0, maxval=4, dtype=tf.int32))
     image = tf.image.random_brightness(image, max_delta=0.2)
     image = tf.image.random_contrast(image, lower=0.8, upper=1.2)
     return image
@@ -56,7 +56,7 @@ data = data.map(lambda x, y: (augment(x), y))
 data = data.map(lambda x, y: (preprocess_input(x), y))
 
 # Shuffle the dataset first
-data = data.shuffle(buffer_size=500000, seed=42, reshuffle_each_iteration=False)
+data = data.shuffle(buffer_size=400000, seed=42, reshuffle_each_iteration=False)
 
 # Split Data
 data_size = data.cardinality().numpy()
@@ -103,7 +103,7 @@ logdir = f'logs/resnet_model'
 tensorboard_callback = TensorBoard(log_dir=logdir)
 early_stopping_callback = EarlyStopping(
     monitor='val_loss',
-    patience=100,
+    patience=150,
     restore_best_weights=True
 )
 
@@ -111,7 +111,7 @@ start_time = time.time()
 
 hist = model.fit(
     train,
-    epochs=800,
+    epochs=1000,
     validation_data=val,
     callbacks=[tensorboard_callback, early_stopping_callback]
 )
@@ -123,7 +123,7 @@ histories.append(hist)
 
 # Save the Model
 os.makedirs('models', exist_ok=True)
-model.save('models/tf_model_py310_sp_acc_and_recall_may_16_soc1_2025.h5')
+model.save('models/tf_model_py310_sp_acc_and_recall_july_27_soc_2_2025.h5')
 
 # Plot validation accuracy
 plt.figure(figsize=(12, 8))

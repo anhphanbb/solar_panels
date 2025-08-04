@@ -9,15 +9,14 @@ import os
 import numpy as np
 import pandas as pd
 from netCDF4 import Dataset
-import re
 
 # Define input and output folders
 # nc_input_folder = r'E:\soc\l0c\2024\09'
-nc_input_folder = r'E:\soc\l0c\2025\05'
+nc_input_folder = r'E:\soc\l0c\2025\06'
 
 csv_predictions_folder = 'sp_orbit_predictions/csv'
 
-nc_output_folder = r'E:\soc\l0c\2025\05\nc_files_with_mlsp'
+nc_output_folder = r'E:\soc\l0c\2025\06\nc_files_with_mlsp'
 # nc_output_folder = r'E:\soc\l0c\2024\09\nc_files_with_mlsp'
 
 # Ensure the output folder exists
