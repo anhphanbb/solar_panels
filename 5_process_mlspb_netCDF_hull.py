@@ -22,7 +22,9 @@ mlsp_nc_folder = r'E:\soc\l0c\2025\06\nc_files_with_mlsp'
 output_directory = r'E:\soc\l0d\2025\06'
 os.makedirs(output_directory, exist_ok=True)
 
-threshold = 0.3
+threshold = 0.6  # Main classification threshold
+expansion_candidate_threshold = 0.4  # Used to select points for cluster expansion
+
 running_average_window = 5
 expansion_factor = 1.5
 pattern = re.compile(r'awe_l(.*)_(\d{5})_(.*)\.nc')
@@ -45,12 +47,13 @@ def expand_cluster_points(cluster_points, mlsp, expansion_factor):
         hull_points = cluster_points[hull.vertices]
         centroid = np.mean(hull_points, axis=0)
         expanded_hull_points = centroid + expansion_factor * (hull_points - centroid)
-        all_points = np.column_stack(np.where(mlsp > 0.1))
+        all_points = np.column_stack(np.where(mlsp > expansion_candidate_threshold))
         inside_hull = Delaunay(expanded_hull_points).find_simplex(all_points) >= 0
         return np.unique(np.vstack((cluster_points, all_points[inside_hull])), axis=0)
     except Exception as e:
         print(f"Error expanding cluster: {e}")
         return cluster_points
+    
 
 def select_and_expand_clusters(thresholded, mlsp, expansion_factor):
     structure = np.zeros((3, 3, 3), dtype=int)
