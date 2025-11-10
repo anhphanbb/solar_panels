@@ -14,10 +14,10 @@ import re
 from matplotlib.patches import Rectangle
 
 # Define the path to the parent directory where the dataset is located
-parent_directory = r'E:\soc\l0d\2025\08'
+parent_directory = r'E:\soc\l0d\2025\09'
 
 # Define the orbit number
-orbit_number = 9576  # Orbit number
+orbit_number = 10057 # Orbit number
 
 # Pad the orbit number with zeros until it has 5 digits
 orbit_str = str(orbit_number).zfill(5)
