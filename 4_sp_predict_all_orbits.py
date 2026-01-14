@@ -20,7 +20,7 @@ import gc
 from concurrent.futures import ThreadPoolExecutor
 
 # Paths
-input_folder = r'E:\soc\l0c\2025\10\sp_images_to_predict'
+input_folder = r'E:\soc\l0c\2025\11\sp_images_to_predict'
 csv_output_folder = 'sp_orbit_predictions/csv'
 model_path = 'models/tf_model_py310_sp_acc_and_recall_july_27_soc_2_2025.h5'
 

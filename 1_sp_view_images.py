@@ -12,11 +12,11 @@ import os
 import re
 
 # Define the path to the parent directory where the dataset is located
-# parent_directory = r'E:\GitHub\solar_panels\sp_selected_orbits_no_glare'
-parent_directory = r'E:\soc\l0c\2025\08'
+parent_directory = r'E:\soc\l0c\2025\11'
+
 
 # Define the orbit number
-orbit_number = 9726  # orbit number
+orbit_number = 11130  # orbit number
 
 # Pad the orbit number with zeros until it has 5 digits
 orbit_str = str(orbit_number).zfill(5)
