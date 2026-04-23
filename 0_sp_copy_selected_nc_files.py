@@ -3,15 +3,15 @@ import shutil
 import re
 
 # Define source and destination directories
-src_dir = r"Z:\soc\l0c\2025\12"
-dst_dir = r"E:\soc\l0c\2025\12"
+src_dir = r"Z:\socfiles\l0c\2026\02"
+dst_dir = r"E:\soc\l0c\2026\02"
 
 # Create the destination directory if it doesn't exist
 os.makedirs(dst_dir, exist_ok=True)
 
 # Define orbit range
-min_orbit = 11467
-max_orbit = 11625
+min_orbit = 12571
+max_orbit = 12714
 
 # Regex pattern to extract orbit number before '_v01'
 pattern = re.compile(r'_([0-9]{5})_v01\.nc$')
@@ -36,17 +36,17 @@ print("Done copying files.")
 # import re
 
 # # Define source and destination directories
-# src_dir = r"Z:\soc\l0c\2025\01"
-# dst_dir = r"E:\soc\l0c\2025\so01"
+# src_dir = r"Z:\socfiles\l0c\2024_03"
+# dst_dir = r"E:\soc\l0c\2024\03"
 
 # # Create the destination directory if it doesn't exist
 # os.makedirs(dst_dir, exist_ok=True)
 
 # # List of selected orbits to copy
-# selected_orbits = [6292, 6320, 6350, 6380, 6410, 6440, 6470, 6500, 6530, 6560, 6590, 6620, 6650, 6680, 6710, 6740, 6770]
+# selected_orbits = [1580, 1598, 1607, 1614, 1800, 1826, 1847, 1874, 1895, 1903, 1904, 1910, 1942, 2002, 2027]
 
 # # Regex pattern to extract orbit number before '_v01'
-# pattern = re.compile(r'_([0-9]{5})_v01\.nc$')
+# pattern = re.compile(r'_([0-9]{5})_v23\.nc$')
 
 # # Loop through files and filter
 # for filename in os.listdir(src_dir):

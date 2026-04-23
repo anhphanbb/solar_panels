@@ -8,9 +8,9 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 # Path to the CSV file with glare intervals
 csv_file_path = 'csv/glare_orbit_intervals_december_2025_bkg.csv'
 # Parent directory with NetCDF files
-parent_directory = r'E:\soc\l0c\2025\12'
+parent_directory = r'E:\soc\l0c\2024\03'
 # Output directory to save files with glare removed
-output_directory = r'E:\soc\l0c\2025\12\no_glare'
+output_directory = r'E:\soc\l0c\2024\03\no_glare'
 
 # Ensure output folder exists
 os.makedirs(output_directory, exist_ok=True)
