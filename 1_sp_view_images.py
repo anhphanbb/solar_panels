@@ -12,11 +12,11 @@ import os
 import re
 
 # Define the path to the parent directory where the dataset is located
-parent_directory = r'E:\soc\l0c\2026\02'
+parent_directory = r'E:\soc\l0c\2026\03'
 
 
 # Define the orbit number
-orbit_number = 12565  # orbit number
+orbit_number = 12211  # orbit number
 
 # Pad the orbit number with zeros until it has 5 digits
 orbit_str = str(orbit_number).zfill(5)
