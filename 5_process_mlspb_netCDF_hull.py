@@ -17,9 +17,9 @@ from scipy.spatial import ConvexHull, Delaunay
 from concurrent.futures import ProcessPoolExecutor, as_completed
 
 # Paths and settings
-original_nc_folder = r'E:\soc\l0c\2026\03'
-mlsp_nc_folder = r'E:\soc\l0c\2026\03\nc_files_with_mlsp'
-output_directory = r'E:\soc\l0d\2026\03'
+original_nc_folder = r'E:\soc\l0c\2026\04'
+mlsp_nc_folder = r'E:\soc\l0c\2026\04\nc_files_with_mlsp'
+output_directory = r'E:\soc\l0d\2026\04'
 os.makedirs(output_directory, exist_ok=True)
 
 threshold = 0.6  # Main classification threshold
