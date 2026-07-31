@@ -17,9 +17,9 @@ from scipy.spatial import ConvexHull, Delaunay
 from concurrent.futures import ProcessPoolExecutor, as_completed
 
 # Paths and settings
-original_nc_folder = r'E:\soc\l0c\2026\04'
-mlsp_nc_folder = r'E:\soc\l0c\2026\04\nc_files_with_mlsp'
-output_directory = r'E:\soc\l0d\2026\04'
+original_nc_folder = r'E:\soc\l0c\2026\05'
+mlsp_nc_folder = r'E:\soc\l0c\2026\05\nc_files_with_mlsp'
+output_directory = r'E:\soc\l0d\2026\05'
 os.makedirs(output_directory, exist_ok=True)
 
 threshold = 0.6  # Main classification threshold
@@ -127,14 +127,55 @@ def process_file(file):
                 # Copy global attributes
                 new_ds.setncatts({attr: orig_ds.getncattr(attr) for attr in orig_ds.ncattrs()})
 
-                # Copy variables with original chunks and compression
+                # Copy variables with original chunk sizes and compression
                 for name, var in orig_ds.variables.items():
-                    if name != 'MLSP':
-                        chunksizes = var.chunking() if var.chunking() else None
-                        new_var = new_ds.createVariable(name, var.datatype, var.dimensions, chunksizes=chunksizes, zlib=True, complevel=4)
-                        new_var[:] = var[:]
-                        new_var.setncatts({attr: var.getncattr(attr) for attr in var.ncattrs()})
-
+                    if name == "MLSP":
+                        continue
+                
+                    # _FillValue must be provided when the variable is created
+                    fill_value = (
+                        var.getncattr("_FillValue")
+                        if "_FillValue" in var.ncattrs()
+                        else None
+                    )
+                
+                    # var.chunking() can return either a list or "contiguous"
+                    original_chunking = var.chunking()
+                    chunksizes = (
+                        original_chunking
+                        if isinstance(original_chunking, (list, tuple))
+                        else None
+                    )
+                
+                    create_kwargs = {
+                        "zlib": True,
+                        "complevel": 4,
+                    }
+                
+                    if chunksizes is not None:
+                        create_kwargs["chunksizes"] = chunksizes
+                
+                    if fill_value is not None:
+                        create_kwargs["fill_value"] = fill_value
+                
+                    new_var = new_ds.createVariable(
+                        name,
+                        var.datatype,
+                        var.dimensions,
+                        **create_kwargs
+                    )
+                
+                    # Copy all attributes except _FillValue
+                    # because it was handled during createVariable()
+                    attributes = {
+                        attr: var.getncattr(attr)
+                        for attr in var.ncattrs()
+                        if attr != "_FillValue"
+                    }
+                    new_var.setncatts(attributes)
+                
+                    new_var[:] = var[:]
+                    
                 # Ensure MLSP dimensions are in new file
                 for dim in mlsp_ds.variables['MLSP'].dimensions:
                     if dim not in new_ds.dimensions:

@@ -21,8 +21,8 @@ import pandas as pd
 # -----------------------------
 # Input / Output
 # -----------------------------
-input_csv = "April2026.csv"
-output_csv = "glare_intervals_April2026.csv"
+input_csv = "May2026.csv"
+output_csv = "glare_intervals_May2026.csv"
 
 # -----------------------------
 # Read CSV
