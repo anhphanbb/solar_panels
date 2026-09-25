@@ -3,8 +3,8 @@ import shutil
 import re
 
 # Define source and destination directories
-src_dir = r"Y:\soc\public\TranferFromSDL"
-dst_dir = r"E:\soc\l0c\2026\04"
+src_dir = r"Y:\soc\l0c\version02\2023\12"
+dst_dir = r"E:\soc\l0c\2023\12"
 
 # Create the destination directory if it doesn't exist
 os.makedirs(dst_dir, exist_ok=True)
@@ -14,7 +14,7 @@ min_orbit = 0
 max_orbit = 99999
 
 # Regex pattern to extract orbit number before '_v01'
-pattern = re.compile(r'_([0-9]{5})_v99\.nc$')
+pattern = re.compile(r'_([0-9]{5})_v02\.nc$')
 
 # Loop through files and filter
 for filename in os.listdir(src_dir):
